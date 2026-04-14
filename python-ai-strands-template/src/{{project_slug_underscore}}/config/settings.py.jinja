@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     # ── AICafe ───────────────────────────────────────────────────────────────
     aicafe_api_key: str = Field(default="", alias="AICAFE_API_KEY")
     aicafe_base_url: str = Field(
-        default="https://aicafe.hcl.com/AICafeService/api/v1/subscription/openai",
+        default="https://aicafe.hcl.com/AICafeService/api/v1/subscription",
         alias="AICAFE_BASE_URL",
     )
     aicafe_deployment_name: str = Field(
