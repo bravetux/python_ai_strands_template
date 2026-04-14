@@ -30,7 +30,7 @@ Use `uv` for dependency management and to run tools.
 All agents use a `create_*_agent()` factory function pattern:
 - Orchestrator uses `SummarizingConversationManager` for long-running sessions.
 - Sub-agents use `SlidingWindowConversationManager` for focused, short-lived tasks.
-- All agents share `BedrockModel` configuration from `settings.py`.
+- All agents use `get_model()` from `llm_client.py`, which returns either `BedrockModel` or `OpenAIModel` (AICafe) based on the `LLM_PROVIDER` env var.
 
 ### Tool Definition
 ```python

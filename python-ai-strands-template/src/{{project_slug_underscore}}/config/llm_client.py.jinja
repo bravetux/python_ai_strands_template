@@ -1,0 +1,81 @@
+"""LLM client factory — returns the right model based on LLM_PROVIDER."""
+
+import logging
+
+import boto3
+from openai import OpenAI
+from strands.models import BedrockModel
+from strands.models.openai import OpenAIModel
+
+from {{project_slug_underscore}}.config.settings import settings
+
+logger = logging.getLogger(__name__)
+
+
+# ── AWS helpers ──────────────────────────────────────────────────────────────
+
+
+def get_bedrock_session() -> boto3.Session:
+    """Return a boto3 Session with credentials for Bedrock.
+
+    Supports temporary credentials (AWS_SESSION_TOKEN) for SSO / STS.
+    """
+    kwargs: dict = {"region_name": settings.aws_region}
+    if settings.aws_access_key_id:
+        kwargs["aws_access_key_id"] = settings.aws_access_key_id
+        kwargs["aws_secret_access_key"] = settings.aws_secret_access_key
+    if settings.aws_session_token:
+        kwargs["aws_session_token"] = settings.aws_session_token
+    return boto3.Session(**kwargs)
+
+
+def get_aws_client(service: str):
+    """Return a boto3 client for the given AWS service."""
+    return boto3.client(service, region_name=settings.aws_region)
+
+
+# ── AICafe helpers ───────────────────────────────────────────────────────────
+
+
+def _build_aicafe_client() -> OpenAI:
+    """Return an OpenAI client configured for the AICafe gateway."""
+    return OpenAI(
+        api_key=settings.aicafe_api_key,
+        base_url=settings.aicafe_base_url,
+        default_headers={"api-key": settings.aicafe_api_key},
+        default_query={
+            "api-version": settings.aicafe_api_version,
+        },
+    )
+
+
+# ── Model factory ───────────────────────────────────────────────────────────
+
+
+def get_model():
+    """Return a Strands-compatible model based on LLM_PROVIDER env var.
+
+    - "bedrock" → BedrockModel (AWS Bedrock)
+    - "aicafe"  → OpenAIModel  (HCL AICafe gateway)
+    """
+    if settings.llm_provider == "aicafe":
+        logger.info("Using AICafe provider (deployment=%s)", settings.aicafe_deployment_name)
+        client = _build_aicafe_client()
+        return OpenAIModel(
+            client=client,
+            model_id=f"deployments/{settings.aicafe_deployment_name}/chat/completions",
+            params={
+                "temperature": settings.agent_temperature,
+                "max_tokens": settings.agent_max_tokens,
+            },
+        )
+
+    # Default: Bedrock
+    logger.info("Using Bedrock provider (model=%s)", settings.bedrock_model_id)
+    return BedrockModel(
+        boto_session=get_bedrock_session(),
+        model_id=settings.bedrock_model_id,
+        temperature=settings.agent_temperature,
+        top_p=settings.agent_top_p,
+        max_tokens=settings.agent_max_tokens,
+    )
