@@ -56,7 +56,7 @@ def get_model():
     """Return a Strands-compatible model based on LLM_PROVIDER env var.
 
     - "bedrock" → BedrockModel (AWS Bedrock)
-    - "aicafe"  → OpenAIModel  (HCL AICafe gateway)
+    - "aicafe"  → OpenAIModel  (AICafe gateway)
     """
     if settings.llm_provider == "aicafe":
         logger.info("Using AICafe provider (deployment=%s)", settings.aicafe_deployment_name)
