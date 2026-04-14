@@ -1,7 +1,5 @@
 """Application settings loaded from environment variables via pydantic-settings."""
 
-from typing import Literal
-
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -11,46 +9,22 @@ class Settings(BaseSettings):
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
-    # ── Provider Switch ──────────────────────────────────────────────────────
-    llm_provider: Literal["bedrock", "aicafe"] = Field(
-        default="bedrock", alias="LLM_PROVIDER"
-    )
-
-    # ── AWS / Bedrock ────────────────────────────────────────────────────────
+    # AWS credentials
     aws_access_key_id: str = Field(default="", alias="AWS_ACCESS_KEY_ID")
     aws_secret_access_key: str = Field(default="", alias="AWS_SECRET_ACCESS_KEY")
     aws_session_token: str = Field(default="", alias="AWS_SESSION_TOKEN")
     aws_region: str = Field(default="us-east-1", alias="AWS_DEFAULT_REGION")
+
+    # LLM
     bedrock_model_id: str = Field(
         default="anthropic.claude-sonnet-4-20250514-v1:0",
         alias="BEDROCK_MODEL_ID",
     )
-
-    # ── AICafe ───────────────────────────────────────────────────────────────
-    aicafe_api_key: str = Field(default="", alias="AICAFE_API_KEY")
-    aicafe_base_url: str = Field(
-        default="https://aicafe.hcl.com/AICafeService/api/v1/subscription",
-        alias="AICAFE_BASE_URL",
-    )
-    aicafe_deployment_name: str = Field(
-        default="gpt-4.1", alias="AICAFE_DEPLOYMENT_NAME"
-    )
-    aicafe_api_version: str = Field(
-        default="2024-12-01-preview", alias="AICAFE_API_VERSION"
-    )
-    aicafe_embeddings_deployment_name: str = Field(
-        default="ADA", alias="AICAFE_EMBEDDINGS_DEPLOYMENT_NAME"
-    )
-    aicafe_embeddings_api_version: str = Field(
-        default="2023-05-15", alias="AICAFE_EMBEDDINGS_API_VERSION"
-    )
-
-    # ── Common LLM Parameters ────────────────────────────────────────────────
     agent_temperature: float = Field(default=0.1, alias="AGENT_TEMPERATURE")
     agent_top_p: float = Field(default=0.9, alias="AGENT_TOP_P")
     agent_max_tokens: int = Field(default=4096, alias="AGENT_MAX_TOKENS")
 
-    # ── Session Management ───────────────────────────────────────────────────
+    # Session
     session_backend: str = Field(default="file", alias="SESSION_BACKEND")
     session_dir: str = Field(default=".sessions", alias="SESSION_DIR")
 

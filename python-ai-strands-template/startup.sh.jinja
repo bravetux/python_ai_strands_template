@@ -15,7 +15,7 @@ fi
 if [ ! -f ".env" ]; then
     echo "Creating .env from .env.example..."
     cp .env.example .env
-    echo "Please fill in your credentials in .env (AWS or AICafe depending on LLM_PROVIDER)"
+    echo "Please fill in your AWS credentials in .env"
 else
     echo ".env already exists, skipping."
 fi

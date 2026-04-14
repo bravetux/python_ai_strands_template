@@ -7,13 +7,14 @@ import pathlib
 from strands import Agent
 from strands.agent.conversation_manager import SummarizingConversationManager
 from strands.hooks import AfterToolCallEvent, BeforeToolCallEvent
+from strands.models import BedrockModel
 from strands_tools.think import think
 
 from {{project_slug_underscore}}.agents.example_agent import create_example_agent
-from {{project_slug_underscore}}.config.llm_client import get_model
+from {{project_slug_underscore}}.config.aws_client import get_bedrock_session
 from {{project_slug_underscore}}.config.prompts import ORCHESTRATOR_SYSTEM_PROMPT
 from {{project_slug_underscore}}.config.settings import settings
-from {{project_slug_underscore}}.tools.example_tools import add_numbers, get_embedding, greet
+from {{project_slug_underscore}}.tools.example_tools import add_numbers, greet
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,13 @@ def create_orchestrator(session_id: str | None = None) -> Agent:
     """
     effective_session_id = session_id or _DEFAULT_SESSION_ID
 
-    model = get_model()
+    model = BedrockModel(
+        boto_session=get_bedrock_session(),
+        model_id=settings.bedrock_model_id,
+        temperature=settings.agent_temperature,
+        top_p=settings.agent_top_p,
+        max_tokens=settings.agent_max_tokens,
+    )
 
     conversation_manager = SummarizingConversationManager(
         summary_ratio=0.4,
@@ -81,7 +88,6 @@ def create_orchestrator(session_id: str | None = None) -> Agent:
         # Add your tools here
         greet,
         add_numbers,
-        get_embedding,
     ]
 
     agent_kwargs: dict = {
