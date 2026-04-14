@@ -1,0 +1,76 @@
+package_name:
+    type: str
+    placeholder: YOUR-PROJECT-NAME
+    help: Name of the Python AI agent package.
+
+project_slug:
+    type: str
+    default: "{{ package_name.lower().replace(' ', '-').replace('_','-') }}"
+    when: false
+
+project_slug_underscore:
+    type: str
+    default: "{{ project_slug.replace('-','_') }}"
+    when: false
+
+project_description:
+    type: str
+    help: Description of the project.
+    default: "A Strands AI agent project"
+
+github_username:
+    type: str
+    help: GitHub username or organization name.
+
+python_version:
+    type: str
+    help: Python version constraint.
+    default: ">=3.12"
+    choices:
+        - ">=3.12"
+        - ">=3.11"
+        - ">=3.10"
+
+include_docker:
+    type: bool
+    help: Include Docker support (Dockerfile + docker-compose).
+    default: true
+
+_subdirectory: python-ai-strands-template
+
+_message_after_copy: |
+    Your project "{{ project_slug }}" has been created successfully!
+
+    1. Initialize the local directory as a Git repository, setup local environment, add files to version control and commit them:
+
+        git init --initial-branch=main
+        make install
+        git add .
+        git commit -m "feat: first commit"
+
+    2. Copy your .env.example to .env and fill in your AWS credentials:
+
+        cp .env.example .env
+
+    3. Copy the URL of your GitHub repository and run:
+
+        git remote add origin https://github.com/{{ github_username }}/{{ project_slug }}.git
+
+    4. You can verify your new remote URL running:
+
+        git remote -v
+
+    5. Now you can push your local files to GitHub.
+
+        git push --set-upstream origin main
+
+    6. Run the Streamlit UI:
+
+        make run
+
+_message_after_update: |
+    Your project "{{ project_slug }}" has been updated successfully!
+    In case there are any conflicts, please resolve them. Then,
+    you're done.
+
+_min_copier_version: "9.0.0"

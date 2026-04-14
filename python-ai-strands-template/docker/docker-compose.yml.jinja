@@ -1,0 +1,12 @@
+services:
+  {{project_slug_underscore}}:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8501:8501"
+    env_file:
+      - ../.env
+    volumes:
+      - ../.sessions:/app/.sessions
+    restart: unless-stopped
