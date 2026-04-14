@@ -9,25 +9,25 @@ if not exist ".git" (
     echo Git repository already initialized.
 )
 
-REM Step 2: Install dependencies and pre-commit hooks
+REM Step 2: Copy .env.example to .env
+if not exist ".env" (
+    echo Creating .env from .env.example...
+    copy .env.example .env
+    echo Please fill in your credentials in .env (AWS or AICafe depending on LLM_PROVIDER)
+) else (
+    echo .env already exists, skipping.
+)
+
+REM Step 3: Install dependencies and pre-commit hooks
 echo Installing dependencies...
 uv sync
 uv run pre-commit install
 
-REM Step 3: Stage and commit files
+REM Step 4: Stage and commit files
 echo Staging and committing files...
 git add .
 git commit -m "feat: first commit"
 if errorlevel 1 echo Nothing to commit.
-
-REM Step 4: Copy .env.example to .env
-if not exist ".env" (
-    echo Creating .env from .env.example...
-    copy .env.example .env
-    echo Please fill in your AWS credentials in .env
-) else (
-    echo .env already exists, skipping.
-)
 
 REM Step 5: Add remote and push
 set REMOTE_URL=https://github.com/{{ github_username }}/{{ project_slug }}.git
